@@ -14,4 +14,5 @@ return array(
 
 	'yzOffice.Main.invalidUrl'			=> "Invalid request address",
 	'yzOffice.Main.tryAgain'			=> ", please try opening again!",
+	'yzOffice.Main.linkExpired'			=> "The link has expired"
 );

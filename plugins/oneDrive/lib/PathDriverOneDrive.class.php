@@ -22,6 +22,7 @@ class PathDriverOneDrive extends PathDriverBase {
 	// 初始化配置信息
 	public function _init($data = array()){
 		$list = array(
+			'name'				=> 'name',
 			'accessToken'		=> 'access_token',
 			'refreshToken'		=> 'refresh_token',
 			'tokenExpireTime'	=> 'token_expire_time',
@@ -312,7 +313,7 @@ class PathDriverOneDrive extends PathDriverBase {
 	 * @param [type] $result
 	 * @return void
 	 */
-	private function recursionFiles($path,&$list, $result,$simple) {
+	private function recursionFiles($path,&$list, $result,$simple=false) {
 		$this->_setPathMeta($path, $result);
 		$fileList = !empty($result['value']) ? $result['value'] : array();
 		$dir = rtrim($path, '/') . '/';

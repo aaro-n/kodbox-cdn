@@ -14,4 +14,5 @@ return array(
 
 	'yzOffice.Main.invalidUrl'			=> "无效的请求地址",
 	'yzOffice.Main.tryAgain'			=> "，请尝试重新打开！",
+	'yzOffice.Main.linkExpired'			=> "链接已失效"
 );

@@ -119,7 +119,8 @@
 				if(data.data.success == 1){
 					clearInterval(repeatTimer);
 					var item = data.data.steps[data.data.steps.length-1];
-					$('.progress-text').html(LNG['success']+LNG['yzOffice.Main.convert']);
+					// $('.progress-text').html(LNG['success']+LNG['yzOffice.Main.convert']);
+					$('.progress-text').html(LNG['yzOffice.Main.convert']);
 					loadSuccess(data);
 				}else{
 					var step = data.data.steps[data.data.currentStep];
@@ -158,7 +159,7 @@
 		var loadError = function(error){
 			$('.progress-slider,.progress-loading').hide();
 			error += '&nbsp;&nbsp;<a class="load_repeat" href="javascript:void(0);">'+
-			LNG['officeReader.yzOffice.transferAgain']+'</a>';
+			LNG['yzOffice.Main.transferAgain']+'</a>';
 			$('.progress-text').addClass('alert-danger').html(error).css('text-align','left');
 		}
 		$(window).ready(function(){

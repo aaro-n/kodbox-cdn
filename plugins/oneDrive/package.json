@@ -2,7 +2,7 @@
 	"id":"oneDrive",
 	"name":"OneDrive",
 	"title":"OneDrive存储对接",
-	"version":"1.03",
+	"version":"1.04",
 	"category":"tools",
 	"source":{
 		"icon":"{{pluginHost}}static/images/icon.png"

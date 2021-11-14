@@ -36,7 +36,7 @@ class yzOfficePlugin extends PluginBase{
 		}
         if(empty($infoData['data']['viewUrl'])) {
             $app->clearCache();
-            show_tips(LNG('officeReader.main.invalidUrl'));
+            show_tips(LNG('yzOffice.Main.invalidUrl'));
         }
 		$link = $infoData['data']['viewUrl'];
         $link = $this->fileLink($link);
@@ -49,6 +49,21 @@ class yzOfficePlugin extends PluginBase{
      * @return void
      */
     private function fileLink($link = false, $del = false){
+		$key = md5($this->pluginName . '.yzOffice.viewUrls');
+        $data = Cache::get($key);
+        if(!$data) $data = array();
+		$name = md5($this->realFilePath);
+        if(!$link) {
+            return isset($data[$name]) ? $data[$name] : false;
+        }
+        if($del) {
+            unset($data[$name]);
+        }else{
+            $data[$name] = $link;
+        }
+        Cache::set($key, $data);
+        return $link;
+
 		$path = $this->pluginPath . 'data/';
 		if(!is_dir($path)) mk_dir($path);
         $file = $path . 'viewurls.txt';
@@ -70,6 +85,20 @@ class yzOfficePlugin extends PluginBase{
     }
     // 链接可能已失效，输出前先判断
     private function fileOutLink($app, $link){
+		$res = url_request($link);
+		$data = json_decode($res['data'], true);
+        // 没有错误(字符串decode结果为null)，且set-cookie不为空（正常为viewpath=xxx，过期的为空），直接输出
+        if(!$data && (!empty($res['header']['Set-Cookie']) || !empty($res['header']['set-cookie']))) {
+            header('Location:' . $link);
+        } else {
+            $app->clearCache();
+            $this->fileLink($link, true);
+            // $this->index();
+            $msg = isset($data['message']) ? $data['message'] : LNG('yzOffice.Main.linkExpired');
+			show_tips($msg . LNG('yzOffice.Main.tryAgain'));
+        }
+		exit;
+
         $res = url_request($link);
 		$data = json_decode($res['data'], true);
         // 没有错误，直接输出
@@ -79,7 +108,7 @@ class yzOfficePlugin extends PluginBase{
         $app->clearCache();
         $this->fileLink($link, true);
 		$msg = isset($data['message']) ? $data['message'] : LNG('explorer.error');
-        show_tips($msg . LNG('officeReader.main.tryAgain'));
+        show_tips($msg . LNG('yzOffice.Main.tryAgain'));
     }
 
 	public function task(){
