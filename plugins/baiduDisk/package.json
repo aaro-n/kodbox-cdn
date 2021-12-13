@@ -2,7 +2,7 @@
 	"id":"baiduDisk",
 	"name":"百度网盘",
 	"title":"百度网盘存储对接",
-	"version":"1.05",
+	"version":"1.06",
 	"category":"tools",
 	"source":{
 		"icon":"{{pluginHost}}static/images/icon.png"

@@ -100,7 +100,8 @@
                 var $box = window.opener.document.querySelector(".store-dtl-box");
                 if(query.code == '0') {
                     // 授权失败，关闭授权开关
-                    var $auth = $box.querySelector("input[name='auth']").click();
+                    // var $auth = $box.querySelector("input[name='auth']").click();
+                    var $auth = $box.querySelector("input[name='auth']").checked = false;
                     return false;
                 }
                 // 给form赋值，3秒后自动关闭

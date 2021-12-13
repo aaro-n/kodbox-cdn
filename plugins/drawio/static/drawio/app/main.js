@@ -760,7 +760,7 @@
 	}
 
 	window.addEventListener('load',function(){
-		// mxStencilRegistry.loadStencilSet(BASE_URL+'app/icons/shape.xml');自定义图形;	
+		// mxStencilRegistry.loadStencilSet(BASE_URL+'app/icons/shape.xml');//自定义图形;	
 		var pathBase = BASE_URL_CDN+'app/';
 		mxscript(pathBase+'color.js');
 		mxscript(pathBase+'processon-icon.js');

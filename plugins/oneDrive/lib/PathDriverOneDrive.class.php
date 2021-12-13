@@ -10,6 +10,7 @@ class PathDriverOneDrive extends PathDriverBase {
 	protected $refreshToken = '';
 	protected $tokenExpireTime = '';
 	protected $name = '';	// 存储名称，用于刷新token
+	protected $type = 'int';	// 账号类型：int、cn
 
 	public $ioUploadServer = 1;
 	public $ioFileOutServer = 0;
@@ -22,7 +23,7 @@ class PathDriverOneDrive extends PathDriverBase {
 	// 初始化配置信息
 	public function _init($data = array()){
 		$list = array(
-			'name'				=> 'name',
+			// 'name'				=> 'name',
 			'accessToken'		=> 'access_token',
 			'refreshToken'		=> 'refresh_token',
 			'tokenExpireTime'	=> 'token_expire_time',
@@ -33,7 +34,8 @@ class PathDriverOneDrive extends PathDriverBase {
 			}
 			$this->$key = $data[$name];
 		}
-		if(isset($data['name'])) $this->name = $data['name'];
+		if(isset($data['name'])) $this->name = $data['name'];	// 刷新时没有携带
+		if(isset($data['type'])) $this->type = $data['type'];
 	}
 	// 检查accessToken
 	public function checkToken(){
@@ -54,7 +56,11 @@ class PathDriverOneDrive extends PathDriverBase {
 	public function graph_request($url = '', $data = array(), $method = 'GET', $headers = array()){
 		$headers[] = 'Authorization:bearer ' . $this->accessToken;
 		if(substr($url,0,4) != 'http') {
-			$url = 'https://graph.microsoft.com/v1.0/me/drive/root' . $url;
+			$urls = array(
+				'int' => 'https://graph.microsoft.com/v1.0/me/drive/root',
+				'cn' => 'https://microsoftgraph.chinacloudapi.cn/v1.0/me/drive/root',	// 世纪互联
+			);
+			$url = $urls[$this->type] . $url;
 		}
 		$res = url_request($url,  $method, $data, $headers);
 		return $this->resRequest($res);

@@ -203,14 +203,19 @@ window.drawSearchLoad = function(){
 			addAcion('shape=braceLeft;',80,120,'Left brace','');
 			addAcion('shape=braceRight;',80,120,'Right brace','');
 			addAcion('shape=braceGroup;',160,120,'Brace group','label');
-			// addAcion('shape=braceGroupLine;fillColor=none;',160,120,'Brace group line','label');
+			
+			var commonStyle = 'shape=mxgraph.basic.polygon;polyline=1;fillColor=none;';
+			var textSytle   = 'verticalLabelPosition=middle;verticalAlign=middle;html=1;labelPosition=center;'
+			addAcion(commonStyle+textSytle+'polyCoords=[[0.2,1],[0,0.93],[0,0.07],[0.2,0]];align=left;spacingLeft=5;',100,100,'Left polygon brace','');
+			// addAcion(commonStyle+textSytle+'polyCoords=[[0.2,1],[0,1],[0,0],[0.2,0]];align=left;spacingLeft=5;',100,100,'Left square brace','');
 		}
 		// if(type == "flowchart"){}
 	});
 	
+	
 	var braceWidth = 16;
 	var shapeAssign = {};
-	var brace = 'shape=mxgraph.mockup.markup.curlyBrace;editable=0;deletable=0;rotatable=0;resizeHeight=1;movable=0;allowArrows=0;connectable=0;';
+	var brace = 'shape=mxgraph.mockup.markup.curlyBrace;editable=0;rotatable=0;resizeHeight=1;movable=0;allowArrows=0;connectable=0;';
 	var braceBox = 'whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;'
 	shapeAssign.braceLeft = function(cell){
 		cell.style  = braceBox+'spacingRight=20;align=right;';

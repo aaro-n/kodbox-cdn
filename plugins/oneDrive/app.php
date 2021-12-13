@@ -27,24 +27,36 @@ class oneDrivePlugin extends PluginBase{
 	public function echoJs(){
 		$this->echoFile('static/main.js');
 	}
-	// 切换插件状态
-	public function onChangeStatus($status){
-		if(!_get($GLOBALS,'isRoot')) show_json(LNG('explorer.noPermissionAction'),false);
-		if($status != '1') return;
 
-		// 每次启用时，重新获取client_id
+	public function onSetConfig($config){
+		if (empty($config['intClientID'])) {
+			$config['intClientID'] = $this->getIntClient();
+		}
+		return $config;
+	}
+
+	// 国际版client_id获取
+	public function getIntClient(){
 		$data = array(
 			'state' => json_encode(array(
 				'type' => 'onedrive',
 				'client_id'	=> '',
 			))
 		);
-		$url = $this->callbackUri();
+		$url = $this->callbackUrl();
 		$res = url_request($url, 'POST', $data);
 		$data = json_decode($res['data'], true);
+		return $data['code'] ? $data['data'] : '';
+	}
 
-		$client_id = $data['code'] ? $data['data'] : '';
-		$this->setConfig(array('client_id' => $client_id));
+	// 切换插件状态，更新int.client_id
+	public function onChangeStatus($status){
+		if(!_get($GLOBALS,'isRoot')) show_json(LNG('explorer.noPermissionAction'),false);
+		if($status != '1') return;
+		// 更新int.client_id
+		if ($client_id = $this->getIntClient()) {
+			$this->setConfig(array('intClientID' => $client_id));
+		}
 	}
 	public function appSetBefore(){
 		if($this->in['app'] != $this->pluginName) return;
@@ -53,8 +65,17 @@ class oneDrivePlugin extends PluginBase{
 
 	// 获取网盘应用client_id（AppKey）
 	public function clientId(){
+		$type = Input::get('type', 'require', 'int');
 		$config = $this->getConfig();
-		$client_id = isset($config['client_id']) ? $config['client_id'] : '';
+		$clientID = $type.'ClientID';
+		$client_id = isset($config[$clientID]) ? $config[$clientID] : '';
+		// 国际版没有时更新
+		if ($type == 'int' && !$client_id) {
+			if ($client_id = $this->getIntClient()) {
+				$this->setConfig(array($clientID => $client_id));
+			}
+		}
+		if (!$client_id) show_json('OneDrive信息异常，请检查插件配置', false);
 		show_json($client_id);
 	}
 
@@ -122,7 +143,8 @@ class oneDrivePlugin extends PluginBase{
 				'refresh_token' => $config['refresh_token'],
 			))
 		);
-		$url = $this->callbackUri();
+		$type = isset($config['type']) ? $config['type'] : 'int';	// 区分版本，用不同的方式刷新
+		$url = $this->callbackUrl($type);
 		$res = url_request($url, 'POST', $data);
 
 		$data = json_decode($res['data'], true);
@@ -143,7 +165,35 @@ class oneDrivePlugin extends PluginBase{
 	}
 
 	// 回调地址，为pathInfo模式
-	private function callbackUri(){
-		return rtrim($GLOBALS['config']['settings']['kodApiServer'], '?') . 'index.php/plugin/platform';
+	private function callbackUrl($type = 'int'){
+		if ($type == 'int') { // 国际版
+			return rtrim($GLOBALS['config']['settings']['kodApiServer'], '?') . 'index.php/plugin/platform';
+		}
+		return $this->pluginApi . 'callback';	// 世纪互联
+	}
+
+	/**
+	 * 世纪互联版回调地址
+	 * @return void
+	 */
+	public function callback(){
+		$in = $this->in;
+		if (isset($in['state'])) {
+			$state = json_decode($in['state'], true);
+			if($state && isset($state['type'])) {
+				if(isset($in['code'])) {
+					$state['code'] = $in['code'];
+				}
+				$in = $state;
+				$type = strtolower($state['type']);
+			}
+		}
+		include_once($this->pluginPath.'lib/token.class.php');
+		$token = new token($this);
+		$token->index($in);
+	}
+
+	public function test(){
+
 	}
 }

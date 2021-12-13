@@ -6,9 +6,13 @@ window.posDataToXml = function(jsonStr){
 	}else if(json.def){
 		data = jsonDecode(json.def);
 	}
+	
+	
+	var defaultStyle = {};
 	var create = function(){
 		var nodes = Object.values(data.elements);
 		makeGroupNode(nodes);
+		makeDefaultStyle();
 		nodes.sort(function(a,b){
 			return a.props.zindex > b.props.zindex ? 1:(a.props.zindex === b.props.zindex ? 0:-1);
 		});
@@ -27,6 +31,22 @@ window.posDataToXml = function(jsonStr){
 		// console.log(132,xml,data.elements);
 		return xml;
 	};
+	
+	var makeDefaultStyle = function(){
+		var theme = data.theme;
+		if(!theme || !theme.shape) return;
+		defaultStyle = {
+			fillColor:theme.shape.fillStyle && paramColor(theme.shape.fillStyle.color),
+			strokeColor:theme.shape.lineStyle && paramColor(theme.shape.lineStyle.color),
+			strokeWidth:theme.shape.lineStyle && theme.shape.lineStyle.lineWidth,
+			
+			fontColor:theme.shape.fontStyle && paramColor(theme.shape.fontStyle.color),
+			fontSize:theme.shape.fontStyle && theme.shape.fontStyle.size,
+			fontBold:theme.shape.fontStyle && theme.shape.fontStyle.bold,
+			fontItalic:theme.shape.fontStyle && theme.shape.fontStyle.italic,
+		};
+		// console.log(123,theme,defaultStyle);
+	}
 	
 	// 构造组合节点
 	var makeGroupNode = function(nodes){
@@ -75,13 +95,14 @@ window.posDataToXml = function(jsonStr){
 	var paramMakeStyle = function(obj){return paramMake(obj,'style');}
 	var paramMakeAttr  = function(obj){return paramMake(obj,'attr');}
 	var paramColor     = function(color){
+		if(!color) return '';
 		if(color == 'transparent') return '';
 		if(color.indexOf(',') == -1) return color;
 		var arr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
 		var strHex = '#';
 		for(var i=0; i<arr.length; i++){
 			var hex = Number(arr[i]).toString(16);
-			if( hex === "0" ){hex += hex;}
+			if(hex.length != 2){hex = '0'+ hex;}
 			strHex += hex;
 		}
 		return strHex;
@@ -97,13 +118,17 @@ window.posDataToXml = function(jsonStr){
 			return '<mxGeometry '+paramMakeAttr(geoAttr)+'><mxPoint x="'+offsetX+'" as="offset" /></mxGeometry>';
 		}
 		
-		var theNode 	= node;
+		var theNode 	= node,formTo = [];
 		var parentID 	= theNode.container || theNode.group || false;
 		var linePoints	= node.points || [];
+		if(node.from){formTo.push({x:node.from.x,y:node.from.y,as:'sourcePoint'});}
+		if(node.to){formTo.push({x:node.to.x,y:node.to.y,as:'targetPoint'});}
+		
 		while(parentID && data.elements[parentID]){
 			theNode = data.elements[parentID];
 			parentID = theNode.container || theNode.group || false;
-			if(!theNode) break;
+			if(!theNode || !theNode.props || isNaN(theNode.props.x)) break;
+			if(theNode.props.relative) break;
 			geoAttr.x = geoAttr.x - theNode.props.x;
 			geoAttr.y = geoAttr.y - theNode.props.y;
 			
@@ -112,14 +137,22 @@ window.posDataToXml = function(jsonStr){
 				linePoints[i].x = linePoints[i].x - theNode.props.x;
 				linePoints[i].y = linePoints[i].y - theNode.props.y;
 			}
-		}
-
-		if(node.from){
-			var pointsXml = '';
-			for(var i=0; i< linePoints.length; i++){
-				pointsXml += '<mxPoint x="'+linePoints[i].x+'" y="'+linePoints[i].y+'" />'
+			for(var i=0; i< formTo.length; i++){
+				formTo[i].x = formTo[i].x - theNode.props.x;
+				formTo[i].y = formTo[i].y - theNode.props.y;
 			}
-			return '<mxGeometry relative="1" as="geometry"><Array as="points">'+pointsXml+'</Array></mxGeometry>';
+			break;// 只计算一层;相对上一层坐标处理完成即可;
+		}
+		var makePoints = function(points){
+			var xml = ''
+			for(var i=0; i< points.length; i++){
+				xml += '<mxPoint '+paramMakeAttr(points[i])+'/>';
+			}
+			return xml;
+		}
+		if(node.from){
+			var pointsXml = makePoints(formTo)+'<Array as="points">'+makePoints(linePoints)+'</Array>';
+			return '<mxGeometry relative="1" as="geometry">'+pointsXml+'</mxGeometry>';
 		}
 		return '<mxGeometry '+paramMakeAttr(geoAttr)+'/>';
 	}
@@ -130,7 +163,7 @@ window.posDataToXml = function(jsonStr){
 		var extendKey = function(key){
 			var match = shapeMap[key] || shapeMap[key.toLowerCase()];
 			// if(!match) return;
-			if(!match){match = {fillColor:'none'};}
+			if(!match){match = {};};//match = {fillColor:'none'};
 			
 			var styleAdd = match.length ? match[0]:match;
 			var attrAdd  = match.length ? match[1]:{};
@@ -178,13 +211,16 @@ window.posDataToXml = function(jsonStr){
 		if(node.name != 'linker') return;
 		attr.source = node.from.id;
 		attr.target = node.to.id;
-		attr.value  = node.text || '';
+		attr.value  = htmlEncode(text2html(node.text || ''));
 		attr.edge = 1;
 		style.jettySize = 'auto';
+		style.whiteSpace = 'nowrap';
 		
+		if(!attr.target){delete attr.target;}
+		if(!attr.source){delete attr.source;}
 		if(node.linkerType == 'normal'){}
 		if(node.linkerType == 'curve'){style.curved = '1';}
-		if(node.linkerType == 'broken'){style.edgeStyle = 'orthogonalEdgeStyle';}
+		// if(node.linkerType == 'broken'){style.edgeStyle = 'orthogonalEdgeStyle';}
 		makeLinkPosition(node.from,'exitX','exitY',style);
 		makeLinkPosition(node.to,'entryX','entryY',style);
 		
@@ -223,14 +259,13 @@ window.posDataToXml = function(jsonStr){
 	var createNode = function(node){
 		//note:备注; linker:连接线;
 		var attr  = {id:node.id||"",parent:node.container || node.group || 1};
-		var style = {html:1,whiteSpace:'wrap',rounded:0};
+		var style = {html:1,whiteSpace:'wrap',rounded:0,imageAspect:0};
 		if(node.textBlock && node.textBlock[0]){//文字;
 			var block = node.textBlock[0];
 			var text  = block.text || '';
 			attr.value = htmlEncode(text.replace(/[\r\n]/g,'<br/>'));
+			attr.value = attr.value.replace(/&nbsp;/g,' ');
 			attr.vertex = 1;
-			// style.spacingLeft = poseValue(block.position,'x',node);
-			// style.spacingTop  = poseValue(block.position,'y',node);
 		}
 		makeLinkNode(node,attr,style);
 		mapShape(node,attr,style);
@@ -238,12 +273,13 @@ window.posDataToXml = function(jsonStr){
 		if(node.lineStyle){
 			if(node.lineStyle.lineColor){style.strokeColor = paramColor(node.lineStyle.lineColor);}
 			if(node.lineStyle.lineStyle && !style.strokeColor){style.strokeColor = '#444444';}
-			if(node.lineStyle.lineStyle == 'dot'){style.dotted = 1;}
+			if(node.lineStyle.lineStyle == 'dot'){style.dashed = 1;style.dashPattern='1 2';}
 			if(node.lineStyle.lineStyle == 'dashed'){style.dashed = 1;}
-			if(node.lineStyle.lineStyle == 'dashdot'){style.dotted = 1;}
+			if(node.lineStyle.lineStyle == 'dashdot'){style.dashed = 1;style.dashPattern='1 2 4 2';}
 			
 			// 框;
 			if(style.strokeWidth && node.lineStyle.lineWidth===0 && node.category == 'aws_groups'){
+				style.strokeWidth = node.lineStyle.lineWidth || style.strokeWidth;
 				node.lineStyle.lineWidth = style.strokeWidth;
 			}
 			if(node.lineStyle.lineWidth !== undefined){style.strokeWidth = node.lineStyle.lineWidth;}
@@ -251,10 +287,10 @@ window.posDataToXml = function(jsonStr){
 		}
 
 		if(node.fontStyle){
-			if(node.fontStyle.size){style.fontSize = node.fontStyle.size;}
+			if(node.fontStyle.size){style.fontSize = node.fontStyle.size - 1;}
 			if(node.fontStyle.color){style.fontColor = paramColor(node.fontStyle.color);}
 			if(node.fontStyle.textAlign){style.align = node.fontStyle.textAlign;}
-			if(node.fontStyle.vAlign){style.verticalAlign = node.fontStyle.vAlign;}
+			if(node.fontStyle.vAlign && !style._vAlign){style.verticalAlign = node.fontStyle.vAlign;}
 			if(node.fontStyle.fontFamily){style.fontFamily = node.fontStyle.fontFamily;}
 			
 			//blod:1; italic:2; underline:4;
@@ -265,9 +301,9 @@ window.posDataToXml = function(jsonStr){
 		}
 		
 		// 左对齐情况边距自适应;
-		if(style.align == 'left'){style.spacingLeft=10;style.spacingRight=10;}
+		if(style.align == 'left' && !style.spacingLeft){style.spacingLeft=5;style.spacingRight=5;}
 		if(node.fillStyle){
-			if(node.fillStyle.color && !style.fillColor){
+			if(node.fillStyle.color && !style._fillColor){
 				style.fillColor = paramColor(node.fillStyle.color);
 			}
 			if(node.fillStyle.type =='none'){style.fillColor = 'none';}
@@ -300,13 +336,35 @@ window.posDataToXml = function(jsonStr){
 			style.shape = 'image';style.strokeColor = 'none';attr.vertex = 1;
 			if(image.substr(0,4) == 'http'){
 				style.image = (image.split('?'))[0];
+				var urlInfo = $.parseUrl(image);
+				if( urlInfo.host.indexOf('.bkt.clouddn.com') != -1){
+					style.image = 'https://cdn1.processon.com'+urlInfo.relative;
+				}
 			}else{
 				style.image = 'https://www.processon.com/file/id/'+node.fillStyle.fileId+'/diagram_user_image';
 			}
+			style.image = style.image.replace(/&/g,htmlEncode('&'));
 			// console.error(3003,style.image);
 		};
+		
+		if(node.lineStyle && (!node.lineStyle.lineColor || !node.lineStyle.lineWidth)){
+			if(node.category == 'ui' && !style._strokeColor){style.strokeColor = 'none';}
+		}
+		
+		if(!style.fillColor && node.fillStyle && !node.fillStyle.type){style.fillColor = defaultStyle.fillColor || '#ffffff';}
+		if(node.name == 'text' || node.name == 'standardText' || style.onlyText){
+			style.fillColor = 'none';style.strokeColor = 'none';
+			if(style.verticalAlign == 'top'){style.spacingTop = -5;}
+		}
 		if(node.category == 'search' && node.fillStyle.fileId){setImage(node.fillStyle.fileId);}
 		if(node.name == 'standardImage' && node.fillStyle.fileId){setImage(node.fillStyle.fileId);}
+		
+		// aws图标处理;
+		if((node.category || '').substr(0,4) == 'aws_' && !style.aws){
+			var theName = node.name.replace(/ /g,'_');
+			theName = theName.replace('aws_','');theName = theName.replace('iot_','');
+			$.extend(true,style,{shape:'mxgraph.aws3.'+theName,verticalAlign:'top',verticalLabelPosition:'bottom',align:'center',fillColor:'#F58534'});
+		}
 		processShapeParse(node,attr,style,createNodeHtml);
 		return createNodeHtml(node,style,attr);
 	};

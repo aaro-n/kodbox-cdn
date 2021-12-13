@@ -3,7 +3,7 @@
 	"name":"{{LNG['drawio.meta.name']}}",
 	"title":"{{LNG['drawio.meta.title']}}",
 	"menu":"{{LNG['drawio.menu']}}",
-	"version":"1.07",
+	"version":"1.08",
 	"source":{
 		"icon":"{{pluginHost}}static/images/icon.png",
 		"screenshoot":[
@@ -61,7 +61,7 @@
 			"type":"tags",
 			"display":"{{LNG['admin.plugin.fileExt']}}",
 			"desc":"{{LNG['admin.plugin.fileExtDesc']}}",
-			"value":"drawio,vsd,vsdx,vdx,graphml,pos"
+			"value":"drawio,vsd,vsdx,vdx,graphml,pos,dio"
 		},
 		"fileSort":{
 			"type":"number",

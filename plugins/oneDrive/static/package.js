@@ -34,6 +34,15 @@ define(function(require, exports) {
             "value":"",	
             "className": "hidden",
         },
+        "type": {
+            "type":"select",
+            "value":"int",
+            "info":{
+                "int":'国际版',
+                "cn":'世纪互联',
+            },
+            "display":'账号版本'
+        },
         "auth": {
             "type":"switch",
 			"value":0,

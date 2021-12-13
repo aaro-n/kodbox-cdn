@@ -17,7 +17,7 @@ class PathDriverBaidu extends PathDriverBase {
 	// 初始化配置信息
 	private function _init($data = array()){
 		$list = array(
-			'name'				=> 'name',
+			// 'name'				=> 'name',
 			'accessToken'		=> 'access_token',
 			'refreshToken'		=> 'refresh_token',
 			'tokenExpireTime'	=> 'token_expire_time',
@@ -28,6 +28,7 @@ class PathDriverBaidu extends PathDriverBase {
 			}
 			$this->$key = $data[$name];
 		}
+		if(isset($data['name'])) $this->name = $data['name'];	// 刷新时没有携带
 	}
 	// 检查accessToken
 	public function checkToken(){

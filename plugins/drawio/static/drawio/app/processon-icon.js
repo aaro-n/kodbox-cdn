@@ -2,7 +2,7 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	// 通用
 	text:{text:null,align:'center',verticalAlign:'middle',fillColor:'none',strokeColor:"none"},
 	standardText:{text:null,align:'center',verticalAlign:'middle',fillColor:'none',strokeWidth:0},
-	note:{shape:"note2",boundedLbl:1,strokeColor:"#0000001A",strokeWidth:1},
+	note:{shape:"note2",boundedLbl:1,strokeColor:"#0000001A",strokeWidth:1,spacingLeft:5,spacingTop:-5,size:10},
 	linker:{},
 	round:{ellipse:null,aspect:'fixed'},
 	rectangle:{rounded:0},
@@ -27,26 +27,27 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	
 	apqc:{shape:"delay",direction:"north"},
 	teardrop:{shape:"mxgraph.basic.three_corner_round_rect",dx:20,direction:"west"},
-	singleLeftArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:30,direction:"west"},
-	singleRightArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:30},
-	doubleHorizontalArrow:{shape:"mxgraph.arrows2.twoWayArrow",dy:0.6,dx:30},
-	singleUpArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:30,direction:"north"},
-	singleDownArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:30,direction:"south"},
-	doubleVerticalArrow:{shape:"mxgraph.arrows2.twoWayArrow",dy:0.6,dx:30,direction:"north"},
+	singleLeftArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:15,direction:"west"},
+	singleRightArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:15},
+	doubleHorizontalArrow:{shape:"mxgraph.arrows2.twoWayArrow",dy:0.6,dx:20},
+	singleUpArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:15,direction:"north"},
+	singleDownArrow:{shape:"mxgraph.arrows2.arrow",dy:0.6,dx:15,direction:"south"},
+	doubleVerticalArrow:{shape:"mxgraph.arrows2.twoWayArrow",dy:0.6,dx:20,direction:"north"},
 	backArrow:{shape:"mxgraph.arrows2.uTurnArrow",dy:10,arrowHead:50,dx2:40,direction:'south'},
 	rightBackArrow:{shape:"mxgraph.arrows2.uTurnArrow",dy:10,arrowHead:50,dx2:40,direction:'north',flipV:1},
 	corner:{shape:"mxgraph.basic.frame_corner",dx:10},
-	basic_container:{shape:"mxgraph.basic.rect",verticalAlign:'top',rounded:1,absoluteArcSize:1,arcSize:10},
-	
+	basic_container:{shape:"mxgraph.basic.rect",verticalAlign:'top',rounded:1,absoluteArcSize:1,arcSize:10,_vAlign:true},
+
 	//流程图
-	process:{},
+	process:{rounded:0},flow_process:{shape:'',},
 	decision:{rhombus:null},
 	terminator:{shape:"mxgraph.dfd.start"},
+	flow_terminator:{shape:"mxgraph.dfd.start"},
 	document:{shape:"document"},
 	data:{shape:"parallelogram",perimeter:'parallelogramPerimeter',arcSize:12,size:0.25},
 	predefinedProcess:{shape:"process"},
 	storedData:{shape:'dataStorage'},
-	internalStorage:{shape:"internalStorage",backgroundOutline:1,dx:15,dy:10},
+	internalStorage:{shape:"internalStorage",backgroundOutline:1,dx:15,dy:10,spacingLeft:18,spacingTop:10},
 	sequentialData:{shape:"tapeData",perimeter:"ellipsePerimeter"},
 	directData:{shape:"mxgraph.flowchart.direct_data"},
 	manualInput:{shape:"manualInput"},
@@ -58,7 +59,7 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	parallelMode:{shape:"partialRectangle",right:0,left:0,fillColor:'none'}, // 并行模式;
 	loopLimit:{shape:"loopLimit"},
 	onPageReference:{shape:"mxgraph.flowchart.on-page_reference"},
-	offPageReference:{shape:"offPageConnector",size:0.4},
+	offPageReference:{shape:"offPageConnector",size:0.15},
 	annotation:{shape:"mxgraph.flowchart.annotation_1",pointerEvents:1},
 
 	actor:{shape:'umlActor',outlineConnect:0},
@@ -66,14 +67,53 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	ovalContainer:{ellipse:null,},
 	rectangleContainer:{rounded:1,absoluteArcSize:1,arcSize:10},				
 	
-	verticalPool:{swimlane:null,verticalAlign:"top"},
-	horizontalPool:{swimlane:null,horizontal:0,verticalAlign:"top"},
+	verticalLane:{swimlane:null,fillColor:"none",verticalAlign:"top",_fillColor:true,_vAlign:true,startSize:30,collapsible:0},
+	verticalPool:{swimlane:null,verticalAlign:"top",startSize:40,spacingTop:5,_vAlign:true,collapsible:0},
+	horizontalPool:{swimlane:null,horizontal:0,verticalAlign:"top",collapsible:0,startSize:30},
 	verticalSeparator:{fillColor:"none",verticalAlign:"top"},
 	horizontalSeparator:{fillColor:"none",verticalAlign:"top"},
 	verticalSeparatorBar:{fillColor:"none",verticalAlign:"top"},
 	horizontalSeparatorBar:{fillColor:"none",verticalAlign:"top"},
-	group:[{group:null},{vertex:1,connectable:0,value:''}], 	// 分组
+	group:[{group:null},{vertex:1,connectable:0}], 	// 分组
 	
+	// ui组件; 线条;
+	ui_uiHLine:[{line:null},{vertex:1}],
+	ui_uiVLine:[{line:null,direction:"south"},{vertex:1}],
+	ui_uiLink:[{fillColor:"none",align:'left',whiteSpace:"wrap"},{vertex:1}],
+	ui_input_uiInput:{fillColor:"#ffffff",spacingLeft:5},
+	ui_uiHeading:{onlyText:true},
+	ui_uiLabel:{onlyText:true},
+	ui_uiTooltip:{shape:'callout',size:10,position:0.5,rounded:1},
+	ui_uiBrowser:{
+		swimlane:null,fillColor:"#eeeeee",verticalAlign:"top",_fillColor:true,_vAlign:true,rounded:1,
+		startSize:30,collapsible:0,align:'left',spacingLeft:10,strokeWidth:1,spacingTop:2,swimlaneFillColor:'#ffffff',
+	},
+	ui_uiVScroll:[{
+		shape:'mxgraph.mockup.navigation.scrollBar',barPos:20,direction:'north',strokeColor:'#aaaaaa',fillColor:'#ffffff',fillColor2:'#dddddd',
+		verticalLabelPosition:'bottom',verticalAlign:"top",align:'center',strokeWidth:1,
+	},{vertex:1}],
+	ui_uiHScroll:[{
+		shape:'mxgraph.mockup.navigation.scrollBar',barPos:20,strokeColor:'#aaaaaa',fillColor:'#ffffff',fillColor2:'#dddddd',
+		verticalLabelPosition:'bottom',verticalAlign:"top",align:'center',strokeWidth:1,
+	},{vertex:1}],
+	
+	ui_uiImage:[{shape:'mxgraph.mockup.graphics.simpleIcon',fillColor:'#ffffff',strokeColor:'#bbbbbb',_strokeColor:1},{vertex:1}],
+	ui_uiVideo:[{shape:'mxgraph.mockup.graphics.simpleIcon',fillColor:'#ffffff',strokeColor:'#bbbbbb',_strokeColor:1},{vertex:1}],
+	// ui_input_uiRadio:[{ellipse:null},{vertex:1}],
+
+	ui_uiPieChart:{shape:'mxgraph.mockup.graphics.pieChart',verticalLabelPosition:'top',verticalAlign:"bottom"},
+	ui_uiColumnChart:{shape:'mxgraph.mockup.graphics.columnChart',verticalLabelPosition:'top',verticalAlign:"bottom"},
+	ui_uiLineChart:{shape:'mxgraph.mockup.graphics.lineChart',verticalLabelPosition:'top',verticalAlign:"bottom"},
+	ui_uiBarChart:{shape:'mxgraph.mockup.graphics.barChart',verticalLabelPosition:'top',verticalAlign:"bottom"},
+	ui_uiBubbleChart:{shape:'mxgraph.mockup.graphics.bubbleChart',verticalLabelPosition:'top',verticalAlign:"bottom"},
+	
+	epc_event:{shape:'hexagon'},
+	// bpmn_textAnnotation:{shape:'mxgraph.flowchart.annotation_1'},
+	bpmn_textAnnotation:{shape:'mxgraph.basic.polygon',polyline:1,verticalLabelPosition:'middle',verticalAlign:'middle',
+		labelPosition:'center',polyCoords:'[[0.2,1],[0,1],[0,0],[0.2,0]]',align:'center',fillColor:'none',_fillColor:true,
+	},
+	bpmn_task:{rounded:1,absoluteArcSize:1,arcSize:10},
+
 	// weizhu_bm_company:{},
 	weizhu_bm_external_refer:{ellipse:null,fillColor:"#eeeeee"},
 	weizhu_bm_external_refer_cg:{ellipse:null,fillColor:"#eeeeee"},
@@ -85,11 +125,25 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	// weizhu_bm_company_tlx:{},
 	
 	group_bpmn:{rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666"},
-	"aws_groups_auto scaling container":{rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666",strokeWidth:2},
-	"aws_groups_region container":{rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666",strokeWidth:2},
-	"aws_groups_availability zone":{rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666",strokeWidth:2},
+	"aws_general_user":{aws:1,shape:'mxgraph.aws3.user',fillColor:"#dddddd",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_general_users":{aws:1,shape:'mxgraph.aws3.users',fillColor:"#dddddd",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_workforce_workers":{aws:1,shape:'mxgraph.aws3.users',fillColor:"#dddddd",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_groups_auto scaling container":{aws:1,rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666",strokeWidth:2},
+	"aws_groups_region container":{aws:1,rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#666666",strokeWidth:2},
+	"aws_groups_availability zone":{aws:1,rounded:1,absoluteArcSize:1,arcSize:10,dashed:1,fillColor:"none",strokeColor:"#f58b16",strokeWidth:2},
+	
+	"aws_sdk_ios":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#5A69A4",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_.net":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#5A69A4",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_php":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#5A69A4",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_javascript":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#205E00",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_java":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#EE472A",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_ruby":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#AE1F23",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_python":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#FFD44F",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_python (boto)":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#FFD44F",verticalLabelPosition:'bottom',verticalAlign:"top"},
+	"aws_sdk_xamarin":{aws:1,shape:'mxgraph.aws3.android',fillColor:"#FFD44F",verticalLabelPosition:'bottom',verticalAlign:"top"},
 	
 	// network
+	database:{shape:"cylinder3",size:6,stokeWidth:1.5},
 	"network_access point":{shape:"mxgraph.networks.wireless_modem"},
 	"network_antenna":{shape:"mxgraph.networks.radio_tower"},
 	"network_adsl":{shape:"mxgraph.networks.modem"},
@@ -173,9 +227,21 @@ window.processShapeMap = { //{style..}, [{styles...},{attr...}]
 	"uml_component_component":{shape:'module',jettyWidth:18,jettyHeight:14},//a57
 	"uml_component_componentNodeNonInstance":{shape:"cube",darkOpacity:0.05,darkOpacity2:0.1,fillColor:"none",direction:'south'},//a58
 	"uml_component_componentStart":{ellipse:null,verticalLabelPosition:"bottom",verticalAlign:"top"},//a59
+	
+	
+	ios_icons_ios7ArrowUp:[{shape:'mxgraph.ios7.misc.up'},{vertex:1}],
+	ios_icons_ios7ArrowDown:[{shape:'mxgraph.ios7.misc.down'},{vertex:1}],
+	ios_icons_ios7ArrowLeft:[{shape:'mxgraph.ios7.misc.left'},{vertex:1}],
+	ios_icons_ios7ArrowRight:[{shape:'mxgraph.ios7.misc.right'},{vertex:1}],
+	ios_icons_ios7Arrow:[{shape:'mxgraph.ios7.misc.right'},{vertex:1}],
+	ios_icons_ios7Wifi:[{shape:'mxgraph.ios7.icons.wifi'},{vertex:1}],
+	ios_icons_ios7Bluetooth:[{shape:'mxgraph.ios7.icons.bluetooth'},{vertex:1}],
+	ios_icons_ios7Battery:[{shape:'mxgraph.ios7.icons.battery'},{vertex:1}],
+	ios_icons_ios7Siri:[{shape:'mxgraph.ios7.icons.microphone'},{vertex:1}],
 };
 
 var text2html = function(text){
+	if(text.indexOf('<br>') != -1 || text.indexOf('&nbsp;') != -1) return text;
 	text = htmlEncode(text);
 	text = text.replace(/[\n\r]/g,'<br>');
 	text = text.replace(/ /g,'&nbsp;');
@@ -187,7 +253,7 @@ window.processShapeParse = function(node,attr,style,createNodeHtml){
 	if(typeKey == 'uml_common_package'){
 		var title   = text2html(node.textBlock[0].text);
 		var content = text2html(node.textBlock[1].text);
-		node.fontStyle.bold = false;
+		node.fontStyle.bold = false;style.fontStyle = 0;
 		attr.value = 
 		'<p style="margin:0px;margin-top:5px;margin-left:8px;text-align:left;"><b>'+title+'</b></p>\
 		<p style="margin:0px;margin-top:10px;margin-left:8px;">'+content+'</p>';
@@ -197,7 +263,7 @@ window.processShapeParse = function(node,attr,style,createNodeHtml){
 	if(typeKey == 'uml_common_combinedFragment'){
 		var title   = text2html(node.textBlock[1].text);
 		var content = text2html(node.textBlock[0].text);
-		node.fontStyle.bold = false;
+		node.fontStyle.bold = false;style.fontStyle = 0;
 		attr.value = 
 		'<p style="margin:0px;margin-top:5px;margin-left:8px;text-align:left;"><b>'+title+'</b></p>\
 		<p style="margin:0px;margin-top:10px;margin-left:8px;">'+content+'</p>';
@@ -208,7 +274,7 @@ window.processShapeParse = function(node,attr,style,createNodeHtml){
 	if(typeKey == 'uml_class_interface'){
 		var title   = text2html(node.textBlock[0].text);
 		var content = text2html(node.textBlock[1].text);
-		node.fontStyle.bold = false;
+		node.fontStyle.bold = false;style.fontStyle = 0;
 		attr.value = 
 		'<p style="margin:0px;margin-top:5px;text-align:center;"><b>'+title+'</b></p>\
 		<hr size="2"/><p style="margin:0px;margin-left:8px;">'+content+'</p>';
@@ -218,7 +284,7 @@ window.processShapeParse = function(node,attr,style,createNodeHtml){
 		var title   = text2html(node.textBlock[0].text);
 		var content = text2html(node.textBlock[1].text);
 		var content2 = text2html(node.textBlock[2].text);
-		node.fontStyle.bold = false;
+		node.fontStyle.bold = false;style.fontStyle = 0;
 		attr.value = 
 		'<p style="margin:0px;margin-top:5px;text-align:center;"><b>'+title+'</b></p>\
 		<hr size="2"/><p style="margin:0px;margin-left:8px;">'+content+'</p>\
@@ -259,7 +325,7 @@ var addShapeGroup = function(groupName,group){
 			shape:"image",aspect:"fixed",align:'center',strokeColor:'none',
 			verticalLabelPosition:"bottom",verticalAlign:"top",
 			image:'app/icons/'+groupName + '/'+group[key],
-		},{vertex:1}];
+		},{vertex:1,imageAspect:0}];
 	}
 }
 
@@ -268,7 +334,7 @@ var addShapeGroupSlider = function(groupName,group,iconGroupMethod,iconGroupName
 	functionHook(Sidebar.prototype,iconGroupMethod,false,function(){
 		var icons = [];
 		var style = 'shape=image;aspect=fixed;align=center;strokeColor=none;verticalAlign=top;';
-		style += 'verticalLabelPosition=bottom;image=app/icons/'+groupName+'/';
+		style += 'verticalLabelPosition=bottom;imageAspect=0;image=app/icons/'+groupName+'/';
 		for (var key in group) {
 			var title = group[key].replace('.svg','');
 			icons.push(this.createVertexTemplateEntry(style+group[key],100,100,'',title,null, null,''));
@@ -279,6 +345,8 @@ var addShapeGroupSlider = function(groupName,group,iconGroupMethod,iconGroupName
 }
 
 var iconGroupAliyun = {
+	// "network_server":"ECS.svg",
+	
 	"ali_app_service_CAS":"CAS.svg",
 	"ali_app_service_MAS":"MAS.svg",
 	"ali_app_service_MTS":"MTS.svg",

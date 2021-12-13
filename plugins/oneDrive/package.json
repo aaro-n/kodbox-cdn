@@ -2,7 +2,7 @@
 	"id":"oneDrive",
 	"name":"OneDrive",
 	"title":"OneDrive存储对接",
-	"version":"1.04",
+	"version":"1.05",
 	"category":"tools",
 	"source":{
 		"icon":"{{pluginHost}}static/images/icon.png"
@@ -17,9 +17,6 @@
 		"homePage":"http://www.kodcloud.com",
 	},
 	"configItem":{
-		"formStyle":{
-			"className":"form-box-title-block"
-		},
 		"pluginAuth":{
 			"type":"userSelect",
 			"value":{"all":1},
@@ -28,17 +25,56 @@
 			"className": "hidden",
 			"require":1
 		},
-		"client_id": {
+		"sep001":{
+			"display":"使用说明",
+			"value":
+			"<div class='info-alert info-alert-blue p-10 align-left can-select can-right-menu'>
+			<li class='mb-5'>本插件用于对接OneDrive存储，启用后，可至<a href='./#admin/storage/index' target='_blank'>后台-存储管理</a>，添加OneDrive存储，实现对文件的管理。</li>
+			<li>鉴于第三方对接的诸多限制，在可道云系统中，只用于对OneDrive文件的简单管理，不支持将其作为系统默认存储使用。</li>
+			</div>"
+		},
+		"type":{
+			"type":"segment",
+			"value":"int",
+			"display":"账号版本",
+			"info":{
+				"int":"国际版",
+				"cn":"世纪互联"
+			},
+			"switchItem":{
+				"int":"intClientID",
+				"cn":"cnOpen,cnClientID,cnClientSecret,cnDesc"
+			},
+			"desc":"<span class='ml-5'>世纪互联版需自行注册应用，并配置相关信息</span>"
+		},
+		"intClientID": {
             "type":"input",
             "value":"",	
             "className": "hidden"
         },
-		"sep001":{
-			"display":"",
+		"cnClientID": {
+            "type":"input",
+            "value":"",	
+            "display":"客户端ID"
+        },
+		"cnClientSecret": {
+            "type":"input",
+            "value":"",	
+            "display":"客户端密码"
+        },
+		"cnDesc":{
+			"display":"应用注册",
 			"value":
 			"<div class='info-alert info-alert-blue p-10 align-left can-select can-right-menu'>
-			<li class='mb-10'>本插件用于对接OneDrive存储，启用后，可至<a href='./#admin/storage/index' target='_blank'>后台-存储管理</a>，添加OneDrive存储，实现对文件的管理。</li>
-			<li>鉴于第三方对接的诸多限制，在可道云系统中，只用于对OneDrive文件的简单管理，不支持将其作为系统默认存储使用。</li>
+			<p class='mb-5'>1. 登录<a href='https://portal.azure.cn/' target='_blank'>Microsoft Azure</a>，Azure服务-应用注册-新注册：
+			<br/><span class='ml-10'>1.1【名称】kodbox(可自定义)；</span>
+			<br/><span class='ml-10'>1.2【受支持的帐户类型】选择：任何组织目录；</span>
+			<br/><span class='ml-10'>1.3【重定向URI】选择：Web。填写：
+            <br/><span class='ml-40'>https://kodbox地址/index.php/plugin/oneDrive/callback</span></span>
+			</p>
+			<p class='mb-5'>2. 注册后，获得客户端ID——应用程序(客户端) ID；</p>
+            <p class='mb-5'>3. 证书和密码-新客户端密码添加，获得客户端密码（“值”）；</p>
+            <p class='mb-5'>4. API权限-添加权限-Microsoft Graph-委托的权限：Files下全部权限、offline_access。</p>
 			</div>"
 		}
 	}
